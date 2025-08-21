@@ -10,10 +10,11 @@
 
     <style>
         body {
-            background-color: #f0e4d7; /* kum rengi pastel ton */
+            background-color: #f0e4d7; /* başlangıç kum rengi */
             margin: 0;
             padding: 0;
             font-family: 'Patrick Hand', cursive;
+            transition: background-color 1.5s ease; /* pürüzsüz geçiş */
         }
 
         #poem-container {
@@ -69,7 +70,6 @@
             transform: scale(1.1);
         }
 
-        /* Artık "not-allowed" yok, sadece opacity azalır */
         #poem-button:disabled {
             opacity: 0.5;
             pointer-events: none;
@@ -145,9 +145,11 @@
         const poemEl = document.getElementById("poem");
         const btn = document.getElementById("poem-button");
         const hourglass = document.querySelector('.hourglass');
+        const body = document.body;
 
         let shuffledPoems = [];
         let currentIndex = 0;
+        const originalColor = "#f0e4d7";
 
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
@@ -202,13 +204,37 @@
             document.body.removeChild(tester);
         }
 
+        // Kum ve altın tonları arasında rastgele renk üret
+        function randomSandColor() {
+            const palette = [
+                [240, 228, 215], // açık kum
+                [230, 194, 122], // altın kum
+                [245, 222, 179], // buğday
+                [238, 203, 139], // sıcak bej
+                [250, 214, 137], // yumuşak altın
+                [223, 182, 104]  // koyu altın
+            ];
+
+            const base = palette[Math.floor(Math.random() * palette.length)];
+            const variation = 15;
+
+            const r = Math.min(255, Math.max(180, base[0] + (Math.random() * variation * 2 - variation)));
+            const g = Math.min(255, Math.max(150, base[1] + (Math.random() * variation * 2 - variation)));
+            const b = Math.min(255, Math.max(100, base[2] + (Math.random() * variation * 2 - variation)));
+
+            return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+        }
+
         btn.addEventListener('click', async () => {
             if (btn.disabled) return;
             btn.disabled = true;
             hourglass.classList.add('spin');
 
+            // Arka plan rastgele kum/altın tonuna değişsin
+            body.style.backgroundColor = randomSandColor();
+
             poemEl.classList.remove('visible');
-            await sleep(2000);
+            await sleep(2000); // kum saati animasyonu süresi
 
             currentIndex++;
             if (currentIndex >= shuffledPoems.length) currentIndex = 0;
@@ -217,6 +243,9 @@
             adjustFontSize(nextPoem);
             poemEl.innerText = nextPoem;
             setTimeout(() => poemEl.classList.add('visible'), 50);
+
+            // Eski renge dön
+            body.style.backgroundColor = originalColor;
 
             btn.disabled = false;
             hourglass.classList.remove('spin');
