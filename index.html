@@ -11,7 +11,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Patrick Hand', cursive;
-      transition: background-color 0.3s linear; /* küçük yumuşatma */
+      transition: background-color 0.3s linear;
     }
 
     #poem-container {
@@ -58,16 +58,14 @@
       max-height: 60px;
       position: relative;
       transition: opacity 0.3s, transform 0.2s;
+      outline: none;
+      -webkit-tap-highlight-color: transparent; /* mobilde mavi kareyi kaldır */
+      user-select: none; /* mobilde metin seçimi engelle */
     }
 
     #poem-button:hover:not(:disabled) {
       opacity: 0.8;
       transform: scale(1.1);
-    }
-
-    #poem-button:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
     }
 
     .hourglass {
@@ -190,7 +188,7 @@
       const start = randomSandColor();
       const end = randomSandColor();
 
-      const steps = 60; // daha yumuşak geçiş için fazla adım
+      const steps = 60;
       let currentStep = 0;
 
       return new Promise(resolve => {
@@ -216,7 +214,6 @@
       btn.disabled = true;
       hourglass.classList.add('spin');
 
-      // aynı anda şiir ve arka plan animasyonu
       const bgAnim = animateBackground(2000);
 
       poemEl.classList.remove('visible');
@@ -230,7 +227,7 @@
       poemEl.innerText = nextPoem;
       setTimeout(() => poemEl.classList.add('visible'), 50);
 
-      await bgAnim; // arka plan geçişi bittikten sonra
+      await bgAnim;
       btn.disabled = false;
       hourglass.classList.remove('spin');
     });
