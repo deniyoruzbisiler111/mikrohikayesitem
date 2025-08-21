@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şiir Uygulaması</title>
+    
+    <!-- Google Fonts: Patrick Hand -->
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+
+    <style>
+        /* Sayfa arka planı ve temel stil */
+        body {
+            background-color: #f5f0e6; /* sarımsı pastel ton */
+            margin: 0;
+            padding: 0;
+            font-family: 'Patrick Hand', cursive;
+        }
+
+        #poem-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            height: 300px;
+            max-width: 500px;
+            margin: 20px auto;
+            line-height: 1.6;
+            padding: 15px 10px;
+            box-sizing: border-box;
+        }
+
+        #poem {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            white-space: pre-line;
+            text-align: center;
+            overflow: hidden;
+            transition: opacity 0.8s ease-in-out;
+            opacity: 0;
+            width: 100%;
+        }
+
+        #poem.visible {
+            opacity: 1;
+        }
+
+        #poem-button {
+            padding: 0;
+            border: none;
+            background: transparent;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            position: relative;
+            transition: opacity 0.3s, transform 0.2s;
+        }
+
+        #poem-button:hover:not(:disabled) {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+
+        #poem-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .hourglass {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .hourglass:before {
+            content: "⧖";
+            font-size: 22px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .spin {
+            animation: spin 1s linear 2;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="poem-container">
+        <div id="poem"></div>
+        <button id="poem-button">
+            <span class="hourglass"></span>
+        </button>
+    </div>
+
+    <script>
+        const poems = [
+            `Günah fısıldar
+Vicdan susar
+Rabbin görür`,
+            `Gece karanlık.
+Kalbim daha karanlık.
+Bir tek secde ışık veriyor.`,
+            `Yaşlı adam mezara baktı.
+Gülümsedi: "Yıllardır bekleyen evime kavuştum."`,
+            `mezarlık sessiz
+her taş sessizce haykırıyor
+dönüşe hazırlan diyor`,
+            `Kalabalık alkışladı.
+Mezar sessizce sordu:
+"Kime fayda?"`,
+            `Gün bitti.
+Defter kapanmadı.
+Gece hâlâ şahit.`,
+            `Mezarlık kapısı paslı.
+Ama içindeki herkes uyanık.`,
+            `İnsan unutuyor.
+Zaman unutmuyor.
+Ahiret hiç unutmuyor.`,
+            `Bir damla gözyaşı düştü.
+Toprak içti.
+Gökyüzü şahit oldu.`,
+            `Zenginliğiyle övündü.
+Kefen gelip susturdu.`,
+            `İnsan koşuyor.
+Toprak bekliyor.
+Kazanan, toprağa hazırlanan.`,
+            `Dünya süslü.
+Kabir sade.
+Asıl huzur sadelikte.`,
+            `'Yarın' dedi, tövbe için.
+Azrail 'bugün' dedi.`,
+            `Fermanı dağları titretirdi.
+Şimdi bir avuç toprak altında.
+Sessiz.`,
+            `Dilinden dökülen kelime,
+Kırdığı kalbi unuttu.
+Kirâmen Kâtibîn unutmadı.`,
+            `Dünyanın yükü omuzlarındaydı.
+Secdeye eğildi,
+Yükü Arş'a bıraktı.`,
+            `Gizlice verdiği bir hurma,
+Mahşer günü gölgesi oldu.`,
+            `Ezan okundu.
+Kimi namaza koştu,
+Kimi dünyaya.`
+        ];
+
+        const poemEl = document.getElementById("poem");
+        const btn = document.getElementById("poem-button");
+        const hourglass = document.querySelector('.hourglass');
+        
+        let shuffledPoems = [];
+        let currentIndex = 0;
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        function adjustFontSize(text) {
+            const maxFontSize = 24;
+            const minFontSize = 12;
+            const safetyMargin = 2;
+            const tester = document.createElement('span');
+            tester.style.visibility = 'hidden';
+            tester.style.position = 'absolute';
+            tester.style.whiteSpace = 'nowrap';
+            tester.style.fontFamily = "'Patrick Hand', cursive";
+            document.body.appendChild(tester);
+            const lines = text.split('\n');
+
+            for (let size = maxFontSize; size >= minFontSize; size--) {
+                tester.style.fontSize = size + 'px';
+                let isOverflowing = false;
+                for (const line of lines) {
+                    tester.innerText = line;
+                    if (tester.scrollWidth > (poemEl.clientWidth - safetyMargin)) {
+                        isOverflowing = true;
+                        break;
+                    }
+                }
+                if (!isOverflowing) {
+                    poemEl.style.fontSize = size + 'px';
+                    document.body.removeChild(tester);
+                    return;
+                }
+            }
+            poemEl.style.fontSize = minFontSize + 'px';
+            document.body.removeChild(tester);
+        }
+
+        btn.addEventListener('click', async () => {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            hourglass.classList.add('spin');
+
+            poemEl.classList.remove('visible');
+            await sleep(2000);
+            
+            currentIndex++;
+            if (currentIndex >= shuffledPoems.length) {
+                currentIndex = 0;
+            }
+            const nextPoem = shuffledPoems[currentIndex];
+            
+            adjustFontSize(nextPoem);
+            poemEl.innerText = nextPoem;
+            setTimeout(() => {
+                poemEl.classList.add('visible');
+            }, 50);
+
+            btn.disabled = false;
+            hourglass.classList.remove('spin');
+        });
+        
+        window.onload = () => {
+            shuffledPoems = shuffleArray(poems);
+            currentIndex = -1;
+            currentIndex++;
+            const firstPoem = shuffledPoems[currentIndex];
+            adjustFontSize(firstPoem);
+            poemEl.innerText = firstPoem;
+            setTimeout(() => {
+                poemEl.classList.add('visible');
+            }, 100);
+        };
+    </script>
+</body>
+</html>
