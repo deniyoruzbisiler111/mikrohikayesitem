@@ -9,9 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
 
     <style>
-        /* Sayfa arka planı ve temel stil */
         body {
-            background-color: #f5f0e6; /* sarımsı pastel ton */
+            background-color: #f0e4d7; /* kum rengi pastel ton */
             margin: 0;
             padding: 0;
             font-family: 'Patrick Hand', cursive;
@@ -22,11 +21,11 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            height: 300px;
-            max-width: 500px;
+            height: 50vh;
+            max-width: 90%;
             margin: 20px auto;
             line-height: 1.6;
-            padding: 15px 10px;
+            padding: 15px 5%;
             box-sizing: border-box;
         }
 
@@ -37,6 +36,7 @@
             align-items: center;
             white-space: pre-line;
             text-align: center;
+            overflow-wrap: break-word;
             overflow: hidden;
             transition: opacity 0.8s ease-in-out;
             opacity: 0;
@@ -54,8 +54,10 @@
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            width: 40px;
-            height: 40px;
+            width: 12vw;
+            max-width: 60px;
+            height: 12vw;
+            max-height: 60px;
             position: relative;
             transition: opacity 0.3s, transform 0.2s;
         }
@@ -94,6 +96,17 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+
+        @media screen and (max-width: 400px) {
+            #poem-container {
+                padding: 10px 3%;
+                height: 55vh;
+            }
+            #poem-button {
+                width: 15vw;
+                height: 15vw;
+            }
+        }
     </style>
 </head>
 <body>
@@ -106,64 +119,33 @@
 
     <script>
         const poems = [
-            `Günah fısıldar
-Vicdan susar
-Rabbin görür`,
-            `Gece karanlık.
-Kalbim daha karanlık.
-Bir tek secde ışık veriyor.`,
-            `Yaşlı adam mezara baktı.
-Gülümsedi: "Yıllardır bekleyen evime kavuştum."`,
-            `mezarlık sessiz
-her taş sessizce haykırıyor
-dönüşe hazırlan diyor`,
-            `Kalabalık alkışladı.
-Mezar sessizce sordu:
-"Kime fayda?"`,
-            `Gün bitti.
-Defter kapanmadı.
-Gece hâlâ şahit.`,
-            `Mezarlık kapısı paslı.
-Ama içindeki herkes uyanık.`,
-            `İnsan unutuyor.
-Zaman unutmuyor.
-Ahiret hiç unutmuyor.`,
-            `Bir damla gözyaşı düştü.
-Toprak içti.
-Gökyüzü şahit oldu.`,
-            `Zenginliğiyle övündü.
-Kefen gelip susturdu.`,
-            `İnsan koşuyor.
-Toprak bekliyor.
-Kazanan, toprağa hazırlanan.`,
-            `Dünya süslü.
-Kabir sade.
-Asıl huzur sadelikte.`,
-            `'Yarın' dedi, tövbe için.
-Azrail 'bugün' dedi.`,
-            `Fermanı dağları titretirdi.
-Şimdi bir avuç toprak altında.
-Sessiz.`,
-            `Dilinden dökülen kelime,
-Kırdığı kalbi unuttu.
-Kirâmen Kâtibîn unutmadı.`,
-            `Dünyanın yükü omuzlarındaydı.
-Secdeye eğildi,
-Yükü Arş'a bıraktı.`,
-            `Gizlice verdiği bir hurma,
-Mahşer günü gölgesi oldu.`,
-            `Ezan okundu.
-Kimi namaza koştu,
-Kimi dünyaya.`
+            `Günah fısıldar\nVicdan susar\nRabbin görür`,
+            `Gece karanlık.\nKalbim daha karanlık.\nBir tek secde ışık veriyor.`,
+            `Yaşlı adam mezara baktı.\nGülümsedi: "Yıllardır bekleyen evime kavuştum."`,
+            `mezarlık sessiz\nher taş sessizce haykırıyor\ndönüşe hazırlan diyor`,
+            `Kalabalık alkışladı.\nMezar sessizce sordu:\n"Kime fayda?"`,
+            `Gün bitti.\nDefter kapanmadı.\nGece hâlâ şahit.`,
+            `Mezarlık kapısı paslı.\nAma içindeki herkes uyanık.`,
+            `İnsan unutuyor.\nZaman unutmuyor.\nAhiret hiç unutmuyor.`,
+            `Bir damla gözyaşı düştü.\nToprak içti.\nGökyüzü şahit oldu.`,
+            `Zenginliğiyle övündü.\nKefen gelip susturdu.`,
+            `İnsan koşuyor.\nToprak bekliyor.\nKazanan, toprağa hazırlanan.`,
+            `Dünya süslü.\nKabir sade.\nAsıl huzur sadelikte.`,
+            `'Yarın' dedi, tövbe için.\nAzrail 'bugün' dedi.`,
+            `Fermanı dağları titretirdi.\nŞimdi bir avuç toprak altında.\nSessiz.`,
+            `Dilinden dökülen kelime,\nKırdığı kalbi unuttu.\nKirâmen Kâtibîn unutmadı.`,
+            `Dünyanın yükü omuzlarındaydı.\nSecdeye eğildi,\nYükü Arş'a bıraktı.`,
+            `Gizlice verdiği bir hurma,\nMahşer günü gölgesi oldu.`,
+            `Ezan okundu.\nKimi namaza koştu,\nKimi dünyaya.`
         ];
 
         const poemEl = document.getElementById("poem");
         const btn = document.getElementById("poem-button");
         const hourglass = document.querySelector('.hourglass');
-        
+
         let shuffledPoems = [];
         let currentIndex = 0;
-        
+
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
@@ -176,36 +158,44 @@ Kimi dünyaya.`
             }
             return shuffled;
         }
-        
+
         function adjustFontSize(text) {
             const maxFontSize = 24;
-            const minFontSize = 12;
-            const safetyMargin = 2;
+            const minFontSize = 10;
             const tester = document.createElement('span');
             tester.style.visibility = 'hidden';
             tester.style.position = 'absolute';
-            tester.style.whiteSpace = 'nowrap';
+            tester.style.whiteSpace = 'pre-line';
             tester.style.fontFamily = "'Patrick Hand', cursive";
             document.body.appendChild(tester);
+
+            let fontSize = maxFontSize;
+            const containerWidth = poemEl.clientWidth;
+            const containerHeight = poemEl.clientHeight;
             const lines = text.split('\n');
 
-            for (let size = maxFontSize; size >= minFontSize; size--) {
-                tester.style.fontSize = size + 'px';
-                let isOverflowing = false;
+            while (fontSize >= minFontSize) {
+                tester.style.fontSize = fontSize + 'px';
+                tester.innerText = text;
+
+                const lineHeight = fontSize * 1.6;
+                const totalHeight = lineHeight * lines.length;
+
+                let maxLineWidth = 0;
                 for (const line of lines) {
                     tester.innerText = line;
-                    if (tester.scrollWidth > (poemEl.clientWidth - safetyMargin)) {
-                        isOverflowing = true;
-                        break;
+                    if (tester.scrollWidth > maxLineWidth) {
+                        maxLineWidth = tester.scrollWidth;
                     }
                 }
-                if (!isOverflowing) {
-                    poemEl.style.fontSize = size + 'px';
-                    document.body.removeChild(tester);
-                    return;
+
+                if (maxLineWidth <= containerWidth && totalHeight <= containerHeight) {
+                    break;
                 }
+                fontSize--;
             }
-            poemEl.style.fontSize = minFontSize + 'px';
+
+            poemEl.style.fontSize = fontSize + 'px';
             document.body.removeChild(tester);
         }
 
@@ -216,23 +206,19 @@ Kimi dünyaya.`
 
             poemEl.classList.remove('visible');
             await sleep(2000);
-            
+
             currentIndex++;
-            if (currentIndex >= shuffledPoems.length) {
-                currentIndex = 0;
-            }
+            if (currentIndex >= shuffledPoems.length) currentIndex = 0;
             const nextPoem = shuffledPoems[currentIndex];
-            
+
             adjustFontSize(nextPoem);
             poemEl.innerText = nextPoem;
-            setTimeout(() => {
-                poemEl.classList.add('visible');
-            }, 50);
+            setTimeout(() => poemEl.classList.add('visible'), 50);
 
             btn.disabled = false;
             hourglass.classList.remove('spin');
         });
-        
+
         window.onload = () => {
             shuffledPoems = shuffleArray(poems);
             currentIndex = -1;
@@ -240,9 +226,7 @@ Kimi dünyaya.`
             const firstPoem = shuffledPoems[currentIndex];
             adjustFontSize(firstPoem);
             poemEl.innerText = firstPoem;
-            setTimeout(() => {
-                poemEl.classList.add('visible');
-            }, 100);
+            setTimeout(() => poemEl.classList.add('visible'), 100);
         };
     </script>
 </body>
