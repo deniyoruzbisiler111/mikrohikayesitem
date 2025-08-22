@@ -1,1 +1,31 @@
+name: Generate Poems JSON
+
+on:
+  push:
+    paths:
+      - "all_poems.txt"
+      - "generate-poems.js"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Run generator
+        run: node generate-poems.js
+
+      - name: Commit and Push poems
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "🔄 JSON dosyaları otomatik güncellendi"
+          branch: main
 
