@@ -1,265 +1,170 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Şiir Uygulaması</title>
-    
-    <!-- Google Fonts: Patrick Hand -->
-    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
-
-    <style>
-        body {
-            background-color: #f0e4d7; /* başlangıç kum rengi */
-            margin: 0;
-            padding: 0;
-            font-family: 'Patrick Hand', cursive;
-            transition: background-color 1.5s ease; /* pürüzsüz geçiş */
-        }
-
-        #poem-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            height: 50vh;
-            max-width: 90%;
-            margin: 20px auto;
-            line-height: 1.6;
-            padding: 15px 5%;
-            box-sizing: border-box;
-        }
-
-        #poem {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            white-space: pre-line;
-            text-align: center;
-            overflow-wrap: break-word;
-            overflow: hidden;
-            transition: opacity 0.8s ease-in-out;
-            opacity: 0;
-            width: 100%;
-        }
-
-        #poem.visible {
-            opacity: 1;
-        }
-
-        #poem-button {
-            padding: 0;
-            border: none;
-            background: transparent;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 12vw;
-            max-width: 60px;
-            height: 12vw;
-            max-height: 60px;
-            position: relative;
-            transition: opacity 0.3s, transform 0.2s;
-            outline: none; /* focus çerçevesi yok */
-            -webkit-tap-highlight-color: transparent; /* mobilde mavi highlight yok */
-        }
-
-        #poem-button:hover {
-            opacity: 0.8;
-            transform: scale(1.1);
-        }
-
-        #poem-button:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        .hourglass {
-            display: block;
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
-        .hourglass:before {
-            content: "⧖";
-            font-size: 22px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .spin {
-            animation: spin 1s linear 2;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @media screen and (max-width: 400px) {
-            #poem-container {
-                padding: 10px 3%;
-                height: 55vh;
-            }
-            #poem-button {
-                width: 15vw;
-                height: 15vw;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Şiir Uygulaması</title>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #d6c6ab;
+      margin: 0; padding: 0;
+      font-family: 'Patrick Hand', cursive;
+      transition: background-color 1.5s ease;
+    }
+    #poem-container {
+      display: flex; flex-direction: column;
+      justify-content: space-between; align-items: center;
+      height: 50vh; max-width: 90%;
+      margin: 20px auto; line-height: 1.6;
+      padding: 15px 5%; box-sizing: border-box;
+    }
+    #poem {
+      flex-grow: 1; display: flex;
+      justify-content: center; align-items: center;
+      white-space: pre-line; text-align: center;
+      overflow-wrap: break-word; overflow: hidden;
+      transition: opacity 0.8s ease-in-out;
+      opacity: 0; width: 100%;
+    }
+    #poem.visible { opacity: 1; }
+    #poem-button {
+      padding: 0; border: none; background: transparent;
+      font-size: 18px; font-weight: bold; cursor: pointer;
+      width: 12vw; max-width: 60px;
+      height: 12vw; max-height: 60px;
+      transition: opacity 0.3s, transform 0.2s;
+      outline: none; -webkit-tap-highlight-color: transparent;
+    }
+    #poem-button:hover { opacity: 0.8; transform: scale(1.1); }
+    #poem-button:disabled { opacity: 0.5; pointer-events: none; }
+    .hourglass { display: block; width: 100%; height: 100%; position: relative; }
+    .hourglass:before {
+      content: "⧖"; font-size: 22px; position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+    }
+    .spin { animation: spin 1s linear 2; }
+    @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  </style>
 </head>
 <body>
-    <div id="poem-container">
-        <div id="poem"></div>
-        <button id="poem-button">
-            <span class="hourglass"></span>
-        </button>
-    </div>
+  <div id="poem-container">
+    <div id="poem"></div>
+    <button id="poem-button"><span class="hourglass"></span></button>
+  </div>
 
-    <script>
-        const poems = [
-            `Günah fısıldar.\nVicdan susar.\nRabbin görür.`,
-            `Gece karanlık.\nKalbim daha karanlık.\nBir tek secde ışık veriyor.`,
-            `Yaşlı adam mezara baktı.\nGülümsedi: "Yıllardır bekleyen evime kavuştum."`,
-            `Mezarlık sessiz.\nHer taş sessizce haykırıyor.\n"Dönüşe hazırlan" diyor.`,
-            `Kalabalık alkışladı.\nMezar sessizce sordu:\n"Kime fayda?"`,
-            `Gün bitti.\nDefter kapanmadı.\nGece hâlâ şahit.`,
-            `Mezarlık kapısı paslı.\nAma içindeki herkes uyanık.`,
-            `İnsan unutuyor.\nZaman unutmuyor.\nAhiret hiç unutmuyor.`,
-            `Bir damla gözyaşı düştü.\nToprak içti.\nGökyüzü şahit oldu.`,
-            `Zenginliğiyle övündü.\nKefen gelip susturdu.`,
-            `İnsan koşuyor.\nToprak bekliyor.\nKazanan, toprağa hazırlanan.`,
-            `Dünya süslü.\nKabir sade.\nAsıl huzur sadelikte.`,
-            `'Yarın' dedi, tövbe için.\nAzrail 'bugün' dedi.`,
-            `Fermanı dağları titretirdi.\nŞimdi bir avuç toprak altında.\nSessiz.`,
-            `Dilinden dökülen kelime.\nKırdığı kalbi unuttu.\nKirâmen Kâtibîn unutmadı.`,
-            `Dünyanın yükü omuzlarındaydı.\nSecdeye eğildi,\nYükü Arş'a bıraktı.`,
-            `Gizlice verdiği bir hurma.\nMahşer günü gölgesi oldu.`,
-            `Ezan okundu.\nKimi namaza koştu.\nKimi dünyaya.`
-        ];
+  <script>
+    const poemEl = document.getElementById("poem");
+    const btn = document.getElementById("poem-button");
+    const hourglass = document.querySelector('.hourglass');
+    const body = document.body;
 
-        const poemEl = document.getElementById("poem");
-        const btn = document.getElementById("poem-button");
-        const hourglass = document.querySelector('.hourglass');
-        const body = document.body;
+    let availableFiles = [];
+    let usedFiles = new Set();
+    let poems = [];
+    let currentIndex = -1;
+    const originalColor = "#d6c6ab";
 
-        let shuffledPoems = [];
-        let currentIndex = 0;
-        const originalColor = "#d6c6ab";
+    async function loadAvailableFiles() {
+      const res = await fetch("poems/index.json");
+      availableFiles = await res.json();
+    }
 
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+    async function loadNewFile() {
+      const remaining = availableFiles.filter(f => !usedFiles.has(f));
+      if (remaining.length === 0) return;
+      const file = remaining[Math.floor(Math.random()*remaining.length)];
+      usedFiles.add(file);
+      const res = await fetch("poems/" + file);
+      const data = await res.json();
+      poems = shuffleArray(data.poems);
+      currentIndex = -1;
+    }
+
+    function shuffleArray(array) {
+      let shuffled = [...array];
+      for (let i = shuffled.length-1; i>0; i--) {
+        const j = Math.floor(Math.random()*(i+1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function adjustFontSize(text) {
+      const maxFontSize = 24, minFontSize = 10;
+      const tester = document.createElement('span');
+      tester.style.visibility = 'hidden';
+      tester.style.position = 'absolute';
+      tester.style.whiteSpace = 'pre-line';
+      tester.style.fontFamily = "'Patrick Hand', cursive";
+      document.body.appendChild(tester);
+
+      let fontSize = maxFontSize;
+      const cw = poemEl.clientWidth, ch = poemEl.clientHeight;
+      const lines = text.split('\n');
+
+      while (fontSize >= minFontSize) {
+        tester.style.fontSize = fontSize + 'px';
+        tester.innerText = text;
+        const lh = fontSize*1.6, th = lh*lines.length;
+        let maxW = 0;
+        for (const line of lines) {
+          tester.innerText = line;
+          maxW = Math.max(maxW, tester.scrollWidth);
         }
+        if (maxW <= cw && th <= ch) break;
+        fontSize--;
+      }
+      poemEl.style.fontSize = fontSize + 'px';
+      document.body.removeChild(tester);
+    }
 
-        function shuffleArray(array) {
-            let shuffled = [...array];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-            return shuffled;
-        }
+    function randomSandColor() {
+      const palette = [
+        [240,228,215],[230,194,122],[245,222,179],
+        [238,203,139],[250,214,137],[223,182,104]
+      ];
+      const base = palette[Math.floor(Math.random()*palette.length)];
+      const variation = 15;
+      const r = Math.min(255, Math.max(180, base[0]+(Math.random()*variation*2-variation)));
+      const g = Math.min(255, Math.max(150, base[1]+(Math.random()*variation*2-variation)));
+      const b = Math.min(255, Math.max(100, base[2]+(Math.random()*variation*2-variation)));
+      return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+    }
 
-        function adjustFontSize(text) {
-            const maxFontSize = 24;
-            const minFontSize = 10;
-            const tester = document.createElement('span');
-            tester.style.visibility = 'hidden';
-            tester.style.position = 'absolute';
-            tester.style.whiteSpace = 'pre-line';
-            tester.style.fontFamily = "'Patrick Hand', cursive";
-            document.body.appendChild(tester);
+    function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-            let fontSize = maxFontSize;
-            const containerWidth = poemEl.clientWidth;
-            const containerHeight = poemEl.clientHeight;
-            const lines = text.split('\n');
+    btn.addEventListener('click', async () => {
+      if (btn.disabled) return;
+      btn.disabled = true; hourglass.classList.add('spin');
+      body.style.backgroundColor = randomSandColor();
 
-            while (fontSize >= minFontSize) {
-                tester.style.fontSize = fontSize + 'px';
-                tester.innerText = text;
+      poemEl.classList.remove('visible');
+      await sleep(2000);
 
-                const lineHeight = fontSize * 1.6;
-                const totalHeight = lineHeight * lines.length;
+      currentIndex++;
+      if (currentIndex >= poems.length) {
+        await loadNewFile();
+        currentIndex = 0;
+      }
+      const nextPoem = poems[currentIndex];
+      adjustFontSize(nextPoem);
+      poemEl.innerText = nextPoem;
+      setTimeout(()=>poemEl.classList.add('visible'),50);
 
-                let maxLineWidth = 0;
-                for (const line of lines) {
-                    tester.innerText = line;
-                    if (tester.scrollWidth > maxLineWidth) {
-                        maxLineWidth = tester.scrollWidth;
-                    }
-                }
+      body.style.backgroundColor = originalColor;
+      btn.disabled = false; hourglass.classList.remove('spin');
+    });
 
-                if (maxLineWidth <= containerWidth && totalHeight <= containerHeight) {
-                    break;
-                }
-                fontSize--;
-            }
-
-            poemEl.style.fontSize = fontSize + 'px';
-            document.body.removeChild(tester);
-        }
-
-        // Kum ve altın tonları arasında rastgele renk üret
-        function randomSandColor() {
-            const palette = [
-                [240, 228, 215], // açık kum
-                [230, 194, 122], // altın kum
-                [245, 222, 179], // buğday
-                [238, 203, 139], // sıcak bej
-                [250, 214, 137], // yumuşak altın
-                [223, 182, 104]  // koyu altın
-            ];
-
-            const base = palette[Math.floor(Math.random() * palette.length)];
-            const variation = 15;
-
-            const r = Math.min(255, Math.max(180, base[0] + (Math.random() * variation * 2 - variation)));
-            const g = Math.min(255, Math.max(150, base[1] + (Math.random() * variation * 2 - variation)));
-            const b = Math.min(255, Math.max(100, base[2] + (Math.random() * variation * 2 - variation)));
-
-            return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
-        }
-
-        btn.addEventListener('click', async () => {
-            if (btn.disabled) return;
-            btn.disabled = true;
-            hourglass.classList.add('spin');
-
-            // Arka plan rastgele kum/altın tonuna değişsin
-            body.style.backgroundColor = randomSandColor();
-
-            poemEl.classList.remove('visible');
-            await sleep(2000); // kum saati animasyonu süresi
-
-            currentIndex++;
-            if (currentIndex >= shuffledPoems.length) currentIndex = 0;
-            const nextPoem = shuffledPoems[currentIndex];
-
-            adjustFontSize(nextPoem);
-            poemEl.innerText = nextPoem;
-            setTimeout(() => poemEl.classList.add('visible'), 50);
-
-            // Eski renge dön
-            body.style.backgroundColor = originalColor;
-
-            btn.disabled = false;
-            hourglass.classList.remove('spin');
-        });
-
-        window.onload = () => {
-            shuffledPoems = shuffleArray(poems);
-            currentIndex = -1;
-            currentIndex++;
-            const firstPoem = shuffledPoems[currentIndex];
-            adjustFontSize(firstPoem);
-            poemEl.innerText = firstPoem;
-            setTimeout(() => poemEl.classList.add('visible'), 100);
-        };
-    </script>
+    window.onload = async () => {
+      await loadAvailableFiles();
+      await loadNewFile();
+      currentIndex = 0;
+      const firstPoem = poems[currentIndex];
+      adjustFontSize(firstPoem);
+      poemEl.innerText = firstPoem;
+      setTimeout(()=>poemEl.classList.add('visible'),100);
+    };
+  </script>
 </body>
 </html>
