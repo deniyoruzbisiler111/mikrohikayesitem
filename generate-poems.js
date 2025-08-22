@@ -1,35 +1,41 @@
 const fs = require("fs");
 
-// all_poems.txt dosyasını oku
-const allPoemsText = fs.readFileSync("all_poems.txt", "utf-8");
+// Kaynak şiir dosyası
+const inputFile = "all_poems.txt";
+// Çıkış klasörü
+const outputDir = "poems";
 
-// Şiirleri ayır (boş satıra göre)
-const poems = allPoemsText
-  .split("\n\n")
-  .map((p) => p.trim())
-  .filter((p) => p.length > 0);
+// Dosyayı oku
+const content = fs.readFileSync(inputFile, "utf-8");
 
-// Şiirleri 5’li gruplara böl
-const chunkSize = 5;
-const chunks = [];
-for (let i = 0; i < poems.length; i += chunkSize) {
-  chunks.push(poems.slice(i, i + chunkSize));
+// Şiirleri boş satırlardan ayır
+let poems = content
+  .split(/\n\s*\n/) // boş satıra göre böl
+  .map(p => p.trim())
+  .filter(p => p.length > 0);
+
+// poems klasörünü oluştur (yoksa)
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir);
 }
 
-// poems klasörü yoksa oluştur
-if (!fs.existsSync("poems")) {
-  fs.mkdirSync("poems");
+// 5'erli gruplara böl
+let groupSize = 5;
+let fileIndex = 1;
+
+for (let i = 0; i < poems.length; i += groupSize) {
+  let chunk = poems.slice(i, i + groupSize);
+
+  let jsonData = {
+    poems: chunk.map((poem, idx) => ({
+      id: (i + idx + 1),
+      text: poem
+    }))
+  };
+
+  let fileName = `${outputDir}/poems-${fileIndex}.json`;
+  fs.writeFileSync(fileName, JSON.stringify(jsonData, null, 2), "utf-8");
+  console.log(`✔️ ${fileName} oluşturuldu`);
+
+  fileIndex++;
 }
-
-// Eski dosyaları sil
-fs.readdirSync("poems").forEach((file) => {
-  fs.unlinkSync(`poems/${file}`);
-});
-
-// Yeni JSON dosyaları oluştur
-chunks.forEach((chunk, index) => {
-  const data = { poems: chunk };
-  fs.writeFileSync(`poems/poems${index + 1}.json`, JSON.stringify(data, null, 2));
-});
-
-console.log(`✅ ${chunks.length} JSON dosyası oluşturuldu.`);
