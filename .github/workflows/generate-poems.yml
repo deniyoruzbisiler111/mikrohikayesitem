@@ -5,27 +5,29 @@ on:
     paths:
       - "all_poems.txt"
       - "generate-poems.js"
+  workflow_dispatch: {}   # İstediğinde Actions sekmesinden elle çalıştırabil
+
+permissions:
+  contents: write         # GITHUB_TOKEN push için yetkili olsun
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "18"
 
-      - name: Run generator
+      - name: Generate poems JSON files
         run: node generate-poems.js
 
-      - name: Commit and Push poems
-        uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "🔄 JSON dosyaları otomatik güncellendi"
+          file_pattern: poems/*.json poems/index.json
           branch: main
-
