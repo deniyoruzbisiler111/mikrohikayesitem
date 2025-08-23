@@ -78,9 +78,19 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+            text-align: center;
         }
-        .spin { animation: spin 1s linear 2; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spin .hourglass:before { 
+            animation: spin 1s linear 2;
+        }
+        @keyframes spin { 
+            0% { transform: translate(-50%, -50%) rotate(0deg); } 
+            100% { transform: translate(-50%, -50%) rotate(360deg); } 
+        }
         @media screen and (max-width: 400px) {
             #poem-container { padding: 10px 3%; height: 55vh; }
             #poem-button { width: 15vw; height: 15vw; }
@@ -208,7 +218,7 @@
                 hasClickedBefore = true;
             }
             
-            hourglass.classList.add("spin");
+            btn.classList.add("spin");
             const newColor = randomSandColor();
             body.style.backgroundColor = newColor;
             poemEl.classList.remove("visible");
@@ -218,7 +228,7 @@
             await sleep(500); // Şiir görünür olduktan sonra biraz bekle
             body.style.backgroundColor = originalColor;
             btn.disabled = false;
-            hourglass.classList.remove("spin");
+            btn.classList.remove("spin");
         });
 
         window.onload = () => { 
