@@ -57,12 +57,14 @@
             transition: opacity 0.3s, transform 0.2s;
             outline: none;
             -webkit-tap-highlight-color: transparent;
+            border-radius: 50%;
+        }
+        #poem-button.first-time {
+            border: 2px solid #888;
+            background-color: rgba(200, 200, 200, 0.3);
         }
         #poem-button:hover { opacity: 0.8; transform: scale(1.1); }
         #poem-button:disabled { opacity: 0.5; pointer-events: none; }
-        #poem-button.pulse {
-            animation: pulse 2s infinite;
-        }
         .hourglass {
             display: block;
             width: 100%;
@@ -79,11 +81,6 @@
         }
         .spin { animation: spin 1s linear 2; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.2; }
-            100% { opacity: 1; }
-        }
         @media screen and (max-width: 400px) {
             #poem-container { padding: 10px 3%; height: 55vh; }
             #poem-button { width: 15vw; height: 15vw; }
@@ -183,9 +180,9 @@
             if (btn.disabled) return;
             btn.disabled = true;
             
-            // İlk tıklamada pulse animasyonunu kaldır
+            // İlk tıklamada border ve arka planı kaldır
             if (!hasClickedBefore) {
-                btn.classList.remove("pulse");
+                btn.classList.remove("first-time");
                 hasClickedBefore = true;
             }
             
@@ -203,8 +200,8 @@
         });
 
         window.onload = () => { 
-            // İlk pulse animasyonunu başlat
-            btn.classList.add("pulse");
+            // İlk daire border'ı göster
+            btn.classList.add("first-time");
             showPoem(); 
         };
     </script>
