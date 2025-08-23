@@ -10,7 +10,7 @@
 
     <style>
         body {
-            background-color: #d6c6ab;
+            background-color: #c4b497;
             margin: 0;
             padding: 0;
             font-family: 'Patrick Hand', cursive;
@@ -60,6 +60,9 @@
         }
         #poem-button:hover { opacity: 0.8; transform: scale(1.1); }
         #poem-button:disabled { opacity: 0.5; pointer-events: none; }
+        #poem-button.pulse {
+            animation: pulse 2s infinite;
+        }
         .hourglass {
             display: block;
             width: 100%;
@@ -76,6 +79,11 @@
         }
         .spin { animation: spin 1s linear 2; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
         @media screen and (max-width: 400px) {
             #poem-container { padding: 10px 3%; height: 55vh; }
             #poem-button { width: 15vw; height: 15vw; }
@@ -96,22 +104,25 @@
         const hourglass = document.querySelector('.hourglass');
         const body = document.body;
 
-        const originalColor = "#d6c6ab";
+        const originalColor = "#c4b497";
+        let hasClickedBefore = false;
 
-        let allFiles = [];
-        let fileOrder = [];
-        let currentFileIndex = 0;
-        let poemsInFile = [];
+        // Test şiirleri - sadece test için
+        const testPoems = [
+            "Gökyüzünde yıldızlar dans ediyor\nGeceyle sarmaş dolaş\nRüzgar fısıldıyor kulağıma\nEski şarkıları",
+            
+            "Denizin kıyısında\nKumlar arasında\nKaybolan ayak izleri\nAnıların sessizliği",
+            
+            "Bahçede açan güller\nKırmızı, beyaz, sarı\nKokuları yayılıyor\nRuhuma dokunan\nBir bahar melodisi",
+            
+            "Yağmur damlaları\nPencerede yarış yapıyor\nHer biri farklı bir hikaye\nSöylüyor sessizce",
+            
+            "Kitap sayfaları\nZamanın ötesine götürür\nKelimeler uçuşur havada\nHayal kurduran\nSihirli dünyalar"
+        ];
+
         let currentPoemIndex = 0;
 
         function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
 
         function adjustFontSize(text) {
             const maxFontSize = 24, minFontSize = 10;
@@ -150,43 +161,19 @@
 
         function randomSandColor() {
             const palette = [
-                [240, 228, 215],[230, 194, 122],[245, 222, 179],
-                [238, 203, 139],[250, 214, 137],[223, 182, 104]
+                [196, 180, 151], [186, 167, 129], [206, 189, 163],
+                [176, 160, 139], [216, 199, 171], [166, 150, 119]
             ];
             const base = palette[Math.floor(Math.random() * palette.length)];
-            const variation = 15;
-            const r = Math.min(255, Math.max(180, base[0] + (Math.random() * variation * 2 - variation)));
-            const g = Math.min(255, Math.max(150, base[1] + (Math.random() * variation * 2 - variation)));
+            const variation = 10;
+            const r = Math.min(255, Math.max(140, base[0] + (Math.random() * variation * 2 - variation)));
+            const g = Math.min(255, Math.max(120, base[1] + (Math.random() * variation * 2 - variation)));
             const b = Math.min(255, Math.max(100, base[2] + (Math.random() * variation * 2 - variation)));
             return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
         }
 
-        async function loadIndex() {
-            const res = await fetch("poems/index.json");
-            allFiles = await res.json();
-            resetFileOrder();
-            await loadNextFile();
-            showPoem();
-        }
-        function resetFileOrder() {
-            fileOrder = shuffle([...allFiles]);
-            currentFileIndex = 0;
-        }
-        async function loadNextFile() {
-            if (currentFileIndex >= fileOrder.length) resetFileOrder();
-            const fileName = fileOrder[currentFileIndex];
-            const res = await fetch("poems/" + fileName);
-            const data = await res.json();
-            poemsInFile = shuffle(data.poems);
-            currentPoemIndex = 0;
-            currentFileIndex++;
-        }
         function showPoem() {
-            if (currentPoemIndex >= poemsInFile.length) {
-                loadNextFile().then(showPoem);
-                return;
-            }
-            const poemText = poemsInFile[currentPoemIndex];
+            const poemText = testPoems[currentPoemIndex % testPoems.length];
             adjustFontSize(poemText);
             poemEl.innerText = poemText;
             setTimeout(() => poemEl.classList.add("visible"), 100);
@@ -195,18 +182,31 @@
         btn.addEventListener("click", async () => {
             if (btn.disabled) return;
             btn.disabled = true;
+            
+            // İlk tıklamada pulse animasyonunu kaldır
+            if (!hasClickedBefore) {
+                btn.classList.remove("pulse");
+                hasClickedBefore = true;
+            }
+            
             hourglass.classList.add("spin");
-            body.style.backgroundColor = randomSandColor();
+            const newColor = randomSandColor();
+            body.style.backgroundColor = newColor;
             poemEl.classList.remove("visible");
             await sleep(2000);
             currentPoemIndex++;
             showPoem();
+            await sleep(500); // Şiir görünür olduktan sonra biraz bekle
             body.style.backgroundColor = originalColor;
             btn.disabled = false;
             hourglass.classList.remove("spin");
         });
 
-        window.onload = () => { loadIndex(); };
+        window.onload = () => { 
+            // İlk pulse animasyonunu başlat
+            btn.classList.add("pulse");
+            showPoem(); 
+        };
     </script>
 </body>
 </html>
