@@ -104,22 +104,20 @@
         const originalColor = "#c4b497";
         let hasClickedBefore = false;
 
-        // Test şiirleri - sadece test için
-        const testPoems = [
-            "Gökyüzünde yıldızlar dans ediyor\nGeceyle sarmaş dolaş\nRüzgar fısıldıyor kulağıma\nEski şarkıları",
-            
-            "Denizin kıyısında\nKumlar arasında\nKaybolan ayak izleri\nAnıların sessizliği",
-            
-            "Bahçede açan güller\nKırmızı, beyaz, sarı\nKokuları yayılıyor\nRuhuma dokunan\nBir bahar melodisi",
-            
-            "Yağmur damlaları\nPencerede yarış yapıyor\nHer biri farklı bir hikaye\nSöylüyor sessizce",
-            
-            "Kitap sayfaları\nZamanın ötesine götürür\nKelimeler uçuşur havada\nHayal kurduran\nSihirli dünyalar"
-        ];
-
+        let allFiles = [];
+        let fileOrder = [];
+        let currentFileIndex = 0;
+        let poemsInFile = [];
         let currentPoemIndex = 0;
 
         function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
         function adjustFontSize(text) {
             const maxFontSize = 24, minFontSize = 10;
@@ -169,8 +167,32 @@
             return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
         }
 
+        async function loadIndex() {
+            const res = await fetch("poems/index.json");
+            allFiles = await res.json();
+            resetFileOrder();
+            await loadNextFile();
+            showPoem();
+        }
+        function resetFileOrder() {
+            fileOrder = shuffle([...allFiles]);
+            currentFileIndex = 0;
+        }
+        async function loadNextFile() {
+            if (currentFileIndex >= fileOrder.length) resetFileOrder();
+            const fileName = fileOrder[currentFileIndex];
+            const res = await fetch("poems/" + fileName);
+            const data = await res.json();
+            poemsInFile = shuffle(data.poems);
+            currentPoemIndex = 0;
+            currentFileIndex++;
+        }
         function showPoem() {
-            const poemText = testPoems[currentPoemIndex % testPoems.length];
+            if (currentPoemIndex >= poemsInFile.length) {
+                loadNextFile().then(showPoem);
+                return;
+            }
+            const poemText = poemsInFile[currentPoemIndex];
             adjustFontSize(poemText);
             poemEl.innerText = poemText;
             setTimeout(() => poemEl.classList.add("visible"), 100);
@@ -202,7 +224,7 @@
         window.onload = () => { 
             // İlk daire border'ı göster
             btn.classList.add("first-time");
-            showPoem(); 
+            loadIndex(); 
         };
     </script>
 </body>
